@@ -1,83 +1,81 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const app = express();
+const MongoClient = require('mongodb').MongoClient;
+const { ObjectID, ObjectId} = require('mongodb');
+(async() =>{
 
-app.use(bodyParser.json());
-const door = 3001;
+  const url = 'mongodb://localhost:27017';
 
-const dados = [
-  {
-    "id":1,
-    "nome":"Gabriela Colombo",
-    "idade": 21,
-    "Área atuante": "Tecnologia"
-  },
-  {
-    "id":2,
-    "nome":"Giovana Rodrigues",
-    "idade": 20,
-    "Área atuante": "Medicina"
-  }
-];
+  const dbName = 'Backend_Rest';
+  console.log('Conectando com o banco de dados MongoDB');
 
-// Read all
-app.get('/dados', (req, res)=>{
-  // retorna o que não estiver vazio
-  res.send(dados.filter(Boolean));
-})
 
-// Read id
-app.get('/dados/:id', (req, res)=>{
-  const index = req.params.id - 1;
-  const value = dados[index];
-  if(value == null) res.send("Esse usuário não existe");
-  else res.send(value);
-})
+  const client = await MongoClient.connect(url, {useUnifiedTopology: true});
+  console.log('MongoDB conectado com sucesso');
 
-// Create new user
-app.post('/dados', (req, res) => {
-  const data = req.body;
-  data.id = dados.length + 1;
-  dados.push(data);
-  res.send("Mensagem criada com sucesso...");
-})
+  const db = client.db(dbName);
 
-// Update information
-app.put('/dados/:id', (req, res)=>{
-  const id = +req.params.id;
+  const app = express();
 
-  const newDatas = req.body;
-  
-  const index = dados.findIndex(msg => msg.id ===id);
-  if(index == null) res.send("Não existe esse usuário");
-  else{
-    const mesage = dados[index];
+  app.use(bodyParser.json());
+  const door = 3001;
 
-    // esse ... pega todas as propriedades do mesage (que é o que já
-    // está na lista) e do newDatas (que são as informações atualizadas)
-    dados[index]= {
-      ...mesage,
-      ...newDatas
-    };
+  const dados = db.collection('dados');
+  // Read all
+  app.get('/dados', async (req, res)=>{
+    // retorna o que não estiver vazio
+    res.send(await dados.find().toArray());
+  })
 
-    res.send('Mensagem atualizada com sucesso');
-  }
-  
-})
+  // Read id
+  app.get('/dados/:id', async (req, res)=>{
+    const id = req.params.id;
 
-// Delete
-app.delete('/dados/:id', (req, res) =>{
-  const id = +req.params.id;
+    const data = await dados.findOne({_id: ObjectID(id)})
+    if(data == null) res.send('Não temos essa informação no banco de dados');
+    else res.send(data);
+  })
 
-  const index = dados.findIndex(msg=> msg.id === id);
-  if (index == null) res.send("Esse id não existe");
-  else{
-    delete dados[index];
+  // Create new user
+  app.post('/dados', async (req, res) => {
+    const data = req.body;
+    await dados.insertOne(data);
+    res.send("Mensagem criada com sucesso...");
+  })
+
+  // Update information
+  app.put('/dados/:id', async (req, res)=>{
+    const id = req.params.id;
+    const newDatas = req.body;
+    const data = await dados.findOne({_id: ObjectId(id)})
+
+    if(data == null) res.send("Não existe esse usuário");
+    else{
+      await dados.updateOne(
+        {_id: ObjectId(id)},
+        { $set:{
+          ... newDatas
+        }}
+        
+      )
+      res.send('Mensagem atualizada com sucesso');
+    }
+    
+  })
+
+  // Delete
+  app.delete('/dados/:id', async (req, res) =>{
+    const id = req.params.id;
+    console.log(id);
+    //const data = await dados.findOne({_id: ObjectID(id)})
+    
+    await dados.deleteOne({_id:ObjectID(id)});
     res.send('Mensagem removida com sucesso');
-  }
-})
+    
+  })
 
-app.listen(door, ()=>{
-  console.info('Servidor rodando em http://localhost: ' + door);
-})
+  app.listen(door, ()=>{
+    console.info('Servidor rodando em http://localhost:' + door);
+  })
 
+})();
