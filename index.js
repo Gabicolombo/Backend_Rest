@@ -10,7 +10,7 @@ const dados = [
     "id":1,
     "nome":"Gabriela Colombo",
     "idade": 21,
-    "Área atuante": "Técnologia"
+    "Área atuante": "Tecnologia"
   },
   {
     "id":2,
@@ -45,7 +45,7 @@ app.post('/dados', (req, res) => {
 // Update information
 app.put('/dados/:id', (req, res)=>{
   const id = +req.params.id;
-  
+
   const newDatas = req.body;
   
   const index = dados.findIndex(msg => msg.id ===id);
