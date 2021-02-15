@@ -2,11 +2,12 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const MongoClient = require('mongodb').MongoClient;
 const { ObjectID, ObjectId} = require('mongodb');
+
 (async() =>{
 
   const dbName = 'Backend_Rest';
   //const url = 'mongodb://localhost:27017';
-  const url = 'mongodb+srv://admin:ll6zsQlAPOOXHapM@cluster0.aao1d.mongodb.net/Backend_Rest?retryWrites=true&w=majority';
+const url = `mongodb+srv://admin:ll6zsQlAPOOXHapM@cluster0.aao1d.mongodb.net/Backend_Rest?retryWrites=true&w=majority`;
 
   
   console.log('Conectando com o banco de dados MongoDB');
