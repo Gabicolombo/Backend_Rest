@@ -38,7 +38,18 @@ const { ObjectID, ObjectId} = require('mongodb');
 
   // Create new user
   app.post('/dados', async (req, res) => {
+    const id = req.body.id;
+    // verificando se já está no bando de dados
+    const identificador = await dados.findOne({id: id})
+    if (identificador != null){
+      res.send("Esse usuário já existe");
+      return;
+    } 
     const data = req.body;
+    if(!data) {
+      res.send("Mensagem inválida");
+      return;
+    }
     await dados.insertOne(data);
     res.send("Mensagem criada com sucesso...");
   })
@@ -67,8 +78,11 @@ const { ObjectID, ObjectId} = require('mongodb');
   app.delete('/dados/:id', async (req, res) =>{
     const id = req.params.id;
     console.log(id);
-    //const data = await dados.findOne({_id: ObjectID(id)})
-    
+    const data = await dados.findOne({_id: ObjectID(id)})
+    if (!data){
+      res.send("Esse usuário não existe no banco de dados");
+      return
+    }
     await dados.deleteOne({_id:ObjectID(id)});
     res.send('Mensagem removida com sucesso');
     
