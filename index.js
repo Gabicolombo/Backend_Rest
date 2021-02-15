@@ -18,7 +18,7 @@ const { ObjectID, ObjectId} = require('mongodb');
   const app = express();
 
   app.use(bodyParser.json());
-  const door = 3001;
+  const door = process.env.PORT || 3001;
 
   const dados = db.collection('dados');
   // Read all
