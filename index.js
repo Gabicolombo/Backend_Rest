@@ -4,11 +4,12 @@ const MongoClient = require('mongodb').MongoClient;
 const { ObjectID, ObjectId} = require('mongodb');
 (async() =>{
 
-  const url = 'mongodb://localhost:27017';
-
   const dbName = 'Backend_Rest';
-  console.log('Conectando com o banco de dados MongoDB');
+  //const url = 'mongodb://localhost:27017';
+  const url = 'mongodb+srv://admin:ll6zsQlAPOOXHapM@cluster0.aao1d.mongodb.net/Backend_Rest?retryWrites=true&w=majority';
 
+  
+  console.log('Conectando com o banco de dados MongoDB');
 
   const client = await MongoClient.connect(url, {useUnifiedTopology: true});
   console.log('MongoDB conectado com sucesso');
@@ -21,6 +22,7 @@ const { ObjectID, ObjectId} = require('mongodb');
   const door = process.env.PORT || 3001;
 
   const dados = db.collection('dados');
+
   // Read all
   app.get('/dados', async (req, res)=>{
     // retorna o que não estiver vazio
